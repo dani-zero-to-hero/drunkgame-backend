@@ -1,0 +1,5 @@
+black
+pylint
+mypy
+flake8
+isort
