@@ -6,9 +6,11 @@ routes = web.RouteTableDef()
 @routes.view("/match")
 class Match(web.View):
     async def post(self):
+        # Create a new match
         pass
 
     async def get(self):
+        # Get a list of matches
         pass
 
 
@@ -18,6 +20,7 @@ class SingleMatch(web.View):
         pass
 
     async def get(self):
+        # Get current state of a match
         pass
 
     async def delete(self):

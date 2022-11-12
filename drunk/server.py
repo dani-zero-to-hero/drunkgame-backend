@@ -9,7 +9,6 @@ app = web.Application()
 app.add_routes(
     [
         web.get("/keep-alive", keep_alive),
-        # web.get('/{name}', handle),
     ]
 )
 

@@ -1,15 +1,43 @@
 import abc
-from typing import Optional, Type
+from typing import Type, cast
 
 from pydantic import BaseModel
 
 
-class Game(abc.ABC):
+class Rule(abc.ABC, BaseModel):
     name: str
+    effect: str
+    repeat: bool
+    user_input: bool
+
+
+class TurnResult(abc.ABC, BaseModel):
+    applied_rules: list[Rule]
+    user_input: bool
+    repeat: bool
+
+
+class Game(abc.ABC, BaseModel):
+    _name: str
+    _rules: list[Rule]
+    _turns: list[TurnResult]
+
+    @property
+    @classmethod
+    def game_name(self) -> str:
+        return self._name
+
+    @property
+    def rules(self) -> str:
+        return self.rules
 
     @abc.abstractmethod
-    def play_turn(self):
+    def _play_turn(self) -> TurnResult:
         ...
+
+    def play_turn(self) -> TurnResult:
+        self._turns.append(self._play_turn())
+        return self._turns[-1]
 
     @abc.abstractmethod
     @property
@@ -19,19 +47,18 @@ class Game(abc.ABC):
         """
         ...
 
-    @abc.abstractmethod
     def game_state(self) -> dict:
-        ...
+        return {
+            "name": self._name,
+            "rules": self._rules,
+            "ended": self.end_reached,
+        }
 
     @classmethod
     def get_game(cls, name: str) -> Type["Game"]:
-        games = {game.name: game for game in Game.__subclasses__()}
-        if name in games:
-            return games[name]
-        raise Exception
+        if name in GAMES:
+            return GAMES[name]
+        raise Exception("Game does not exist for the moment")
 
 
-class Rule(BaseModel):
-    name: str
-    player: Optional[str] = None
-    effect: str
+GAMES = {cast(str, game.game_name): game for game in Game.__subclasses__()}
