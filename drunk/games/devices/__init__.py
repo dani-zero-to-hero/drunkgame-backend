@@ -11,7 +11,7 @@ class Dice(ABC):
     def random_roll(self) -> DiceResult:
         if isinstance(self.sides, int):
             return randint(0, self.sides)
-        return self.sides[randint(0, len(self.sides))]
+        return self.sides[randint(0, len(self.sides) - 1)]
 
     def weighted_roll(self, weight) -> DiceResult:
         pass

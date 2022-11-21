@@ -142,7 +142,7 @@ class Jack(Game):
                 "Default jack rule",
                 effect="All jacks drink",
                 trigger="j",
-                user_input=UserAction(action_type=UserActionType.repeat_throw),
+                user_input=UserAction(action_type=UserActionType.repeat),
             )
         )
         self.set_rule(
@@ -165,4 +165,17 @@ class Jack(Game):
 
 if __name__ == "__main__":
     jack = Jack()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
+    jack.play_turn()
     jack.play_turn()

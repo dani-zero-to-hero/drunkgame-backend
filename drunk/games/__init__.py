@@ -3,13 +3,22 @@ from typing import Any, Type, cast
 
 from pydantic import BaseModel, PrivateAttr
 
-from ..players import UserAction
+from ..players import UserAction, UserActionType
 
 
 class Rule(abc.ABC, BaseModel):
     name: str
     effect: str
     user_input: UserAction | None
+
+    @property
+    def repeat(self) -> bool:
+        if (
+            self.user_input is not None
+            and self.user_input.action_type == UserActionType.repeat.value
+        ):
+            return True
+        return False
 
 
 class TurnResult(abc.ABC, BaseModel):
@@ -22,6 +31,7 @@ class Game(BaseModel, abc.ABC):
     _rules: list[Rule] = PrivateAttr(default_factory=list)
     _turns: list[TurnResult] = PrivateAttr(default_factory=list)
     _player: int = PrivateAttr(default=0)
+    _players: int = PrivateAttr(default=2)
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
@@ -37,8 +47,14 @@ class Game(BaseModel, abc.ABC):
         ...
 
     def play_turn(self) -> TurnResult:
-        self._turns.append(self._play_turn())
-        return self._turns[-1]
+        turn = self._play_turn()
+        self._turns.append(turn)
+        if not any(rule.repeat for rule in turn.applied_rules):
+            self._player += 1
+            if self._player >= self._players:
+                self._player = 0
+        print(f"Next player is {self._player}")
+        return turn
 
     @property
     @abc.abstractmethod

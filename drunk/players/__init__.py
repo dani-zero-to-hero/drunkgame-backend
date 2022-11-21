@@ -15,12 +15,14 @@ class Player(BaseModel):
 class UserActionType(Enum):
     set_rule = "set_rule"
     send_drink = "send_drink"
-    repeat_throw = "repeat_throw"
+    repeat = "repeat"
+    drink = "drink"
 
 
 class UserAction(BaseModel):
     action_type: UserActionType
-    player: None | int | Player
+    player: None | int | Player = None
+    drink_amount: None | int = None
 
     class Config:
         use_enum_values = True
