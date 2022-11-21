@@ -1,13 +1,11 @@
+from abc import ABC
 from random import randint
-from typing import Optional, Union
 
-from pydantic import BaseModel
-
-DiceSide = Union[int, list[str]]
-DiceResult = Union[int, str]
+DiceSide = int | list[str]
+DiceResult = int | str
 
 
-class Dice(BaseModel):
+class Dice(ABC):
     sides: DiceSide
 
     def random_roll(self) -> DiceResult:
@@ -39,12 +37,12 @@ class PokerDice(Dice):
     sides = ["black", "red", "j", "q", "k", "ace"]
 
 
-CardSymbol = Union[int, str]
+CardSymbol = int | str
 
 
 class Card:
     symbol: CardSymbol
-    suit: Optional[str]
+    suit: str | None
 
 
 class Jocker(Card):
@@ -52,7 +50,7 @@ class Jocker(Card):
     suit = None
 
 
-class CardDeck(BaseModel):
+class CardDeck(ABC):
     cards: list[Card]
     jockers: int
 

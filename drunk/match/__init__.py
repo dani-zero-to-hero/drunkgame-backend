@@ -1,10 +1,9 @@
 import uuid
-from typing import Optional
 
 from pydantic import BaseModel
 
+from ..games import Game
 from ..players import Player
-from .games import Game
 
 random_id_generators = [uuid.uuid1, uuid.uuid3, uuid.uuid4, uuid.uuid5]
 
@@ -29,7 +28,7 @@ class Match(BaseModel):
     players: list[str]
     match_type: str
     match_state: MatchState
-    _match_result: Optional[MatchResult]
+    _match_result: MatchResult | None
     game: Game
     name: str
     _turns: list[MatchTurnResult]
@@ -62,7 +61,7 @@ class Match(BaseModel):
         return self.match_state.ended
 
     @property
-    def match_result(self) -> Optional[MatchResult]:
+    def match_result(self) -> MatchResult | None:
         if self.has_ended:
             return None
         return self._match_result

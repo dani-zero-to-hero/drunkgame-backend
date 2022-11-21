@@ -3,11 +3,13 @@
 install:
 	python3 -m venv .env
 	.env/bin/pip install -r requirements.txt
+	.env/bin/pip install -e .
 
 install_dev:
 	python3 -m venv .env
 	.env/bin/pip install -r requirements.txt
 	.env/bin/pip install -r requirements.check.txt
+	.env/bin/pip install -e .	
 
 test:
 	.env/bin/pytest tests
