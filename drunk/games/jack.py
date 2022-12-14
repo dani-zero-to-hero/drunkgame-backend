@@ -1,4 +1,4 @@
-from typing import cast, overload
+from typing import overload
 
 from ..players import UserAction, UserActionType
 from . import Game, Rule, TurnResult
@@ -66,15 +66,15 @@ class JackRule(Rule):
 class Jack(Game):
     _name: str = "jack"
     _dice = PokerDice()
+    _rules: list[JackRule]
+    _turns: list[JackResult]
 
     def _play_turn(self) -> JackResult:
         user_input = []
         roll = self._dice.random_roll()
         rules = []
         for rule in self._rules:
-            if cast(JackRule, rule).roll_applies(
-                roll, cast(list[JackResult], self._turns)
-            ):
+            if rule.roll_applies(roll, self._turns):
                 rules.append(rule)
                 if rule.user_input is not None:
                     user_input.append(rule.user_input)

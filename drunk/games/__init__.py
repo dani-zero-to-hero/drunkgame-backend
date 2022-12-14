@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Type, cast
+from typing import Any, Sequence, Type, cast
 
 from pydantic import BaseModel, PrivateAttr
 
@@ -28,8 +28,8 @@ class TurnResult(abc.ABC, BaseModel):
 
 class Game(BaseModel, abc.ABC):
     _name: str
-    _rules: list[Rule] = PrivateAttr(default_factory=list)
-    _turns: list[TurnResult] = PrivateAttr(default_factory=list)
+    _rules: Sequence[Rule] = PrivateAttr(default_factory=list)
+    _turns: Sequence[TurnResult] = PrivateAttr(default_factory=list)
     _player: int = PrivateAttr(default=0)
     _players: int = PrivateAttr(default=2)
 
@@ -48,7 +48,8 @@ class Game(BaseModel, abc.ABC):
 
     def play_turn(self) -> TurnResult:
         turn = self._play_turn()
-        self._turns.append(turn)
+        if isinstance(self._turns, list):
+            self._turns.append(turn)
         if not any(rule.repeat for rule in turn.applied_rules):
             self._player += 1
             if self._player >= self._players:

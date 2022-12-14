@@ -53,10 +53,7 @@ class Match(BaseModel):
     def has_ended(self) -> bool:
         if self.game.end_reached and not self.match_state.ended:
             self.match_state.ended = self.game.end_reached
-            self._match_result = MatchResult(
-                winners=self.players,
-                game=self.game
-            )
+            self._match_result = MatchResult(winners=self.players, game=self.game)
             self._save_match()
         return self.match_state.ended
 
