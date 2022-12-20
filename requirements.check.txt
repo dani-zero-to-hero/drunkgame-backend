@@ -1,5 +1,8 @@
+bandit
 black
-pylint
-mypy
 flake8
+flake8-black
+flake8-isort
 isort
+mypy
+pylint

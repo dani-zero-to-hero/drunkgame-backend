@@ -1,7 +1,10 @@
+"""
+Common endpoints for a server running the drunk game, like keep alive, api docs etc
+"""
 from aiohttp import web
 
 
-async def keep_alive(request: web.Request):
+async def keep_alive(_: web.Request) -> web.Response:
     return web.Response(text="I'm alive and well")
 
 

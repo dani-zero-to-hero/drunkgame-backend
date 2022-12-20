@@ -15,8 +15,9 @@ test:
 	.env/bin/pytest tests
 
 check:
-	.env/bin/mypy drunk tests
 	.env/bin/flake8 drunk tests
+	.env/bin/mypy drunk tests
+	.env/bin/pylint drunk tests
 
 format:
 	.env/bin/isort drunk tests
