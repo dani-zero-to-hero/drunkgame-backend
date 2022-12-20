@@ -18,16 +18,6 @@ class BusRule(Rule):
     """
 
     def applies(self, trigger: Any, turns: list[BusResult]) -> bool:
-        if isinstance(self.trigger, str) and trigger == self.trigger:
-            return True
-        if isinstance(self.trigger, list) and trigger == self.trigger[-1]:
-            applies = True
-            for i in range(1, len(self.trigger)):
-                if turns[0 - i].card_result != self.trigger[-1 - i]:
-                    applies = False
-                    break
-            if applies:
-                return True
         return False
 
 
@@ -61,7 +51,7 @@ class Bus(Game):
 
     @property
     def end_reached(self) -> bool:
-        return False
+        return NotImplemented
 
     def _default_rules(self) -> None:
         self.set_rule(
