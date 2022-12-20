@@ -81,7 +81,7 @@ class Jack(Game):
                 "Default jack rule",
                 effect="All jacks drink",
                 trigger="j",
-                user_input=UserAction(action_type=UserActionType.repeat),
+                user_input=UserAction(action_type=UserActionType.REPEAT),
             )
         )
         self.set_rule(
@@ -97,7 +97,7 @@ class Jack(Game):
                 "Default ace rule",
                 effect="Player sets a rule",
                 trigger="ace",
-                user_input=UserAction(action_type=UserActionType.set_rule),
+                user_input=UserAction(action_type=UserActionType.SET_RULE),
             )
         )
 

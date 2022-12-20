@@ -47,7 +47,7 @@ class Rule(abc.ABC, BaseModel, Generic["T"]):
         """
         if (
             self.user_input is not None
-            and self.user_input.action_type == UserActionType.repeat.value
+            and self.user_input.action_type == UserActionType.REPEAT.value
         ):
             return True
         return False
