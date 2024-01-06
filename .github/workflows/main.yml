@@ -20,40 +20,57 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: 'Login to GitHub Container Registry'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
       - name: Build docker testing image
         run: |
-          echo $CR_PAT | docker login ghcr.io -u alfberdi --password-stdin
-          docker build -t drunk-testing .
-          docker build -t drunk --target drunk .
-          docker push drunk-testing
-          docker push drunk
+          docker build -t ghcr.io/dani-zero-to-hero/DG-backend/drunk-testing .
+          docker build -t ghcr.io/dani-zero-to-hero/DG-backend/drunk --target drunk .
+          docker push ghcr.io/dani-zero-to-hero/DG-backend/drunk-testing
+          docker push ghcr.io/dani-zero-to-hero/DG-backend/drunk
 
   flake8:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Login to ghcr
-        run: echo $CR_PAT | docker login ghcr.io -u alfberdi --password-stdin
+      - name: 'Login to GitHub Container Registry'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
 
       - name: Run flake8
-        run: docker run drunk-testing flake8 drunk tests
+        run: docker run ghcr.io/dani-zero-to-hero/DG-backend/drunk-testing flake8 drunk tests
 
   pylint:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Login to ghcr
-        run: echo $CR_PAT | docker login ghcr.io -u alfberdi --password-stdin
+      - name: 'Login to GitHub Container Registry'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
 
       - name: Run pylint
-        run: docker run drunk-testing pylint drunk tests
+        run: docker run ghcr.io/dani-zero-to-hero/DG-backend/drunk-testing pylint drunk tests
 
   mypy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Login to ghcr
-        run: echo $CR_PAT | docker login ghcr.io -u alfberdi --password-stdin
+      - name: 'Login to GitHub Container Registry'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
 
       - name: Run mypy
-        run: docker run drunk-testing mypy drunk tests
+        run: docker run ghcr.io/dani-zero-to-hero/DG-backend/drunk-testing mypy drunk tests
