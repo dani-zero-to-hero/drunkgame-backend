@@ -1,0 +1,18 @@
+{
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [],
+    "editor.insertSpaces": true,
+    "python.analysis.importFormat": "relative",
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "pylint.importStrategy": "fromEnvironment",
+    "flake8.importStrategy": "fromEnvironment",
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.analysis.typeCheckingMode": "basic",
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit"
+        },
+        "editor.formatOnSave": true
+    }
+}
