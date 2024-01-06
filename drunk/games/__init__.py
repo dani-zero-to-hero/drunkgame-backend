@@ -9,7 +9,9 @@ from typing import Any, ClassVar, Generic, Type, TypeVar, cast, overload
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 from pydantic import PrivateAttr
 
+from ..exceptions import DrunkException
 from ..players import UserAction, UserActionType
+from .devices import Card
 
 
 class Rule(abc.ABC, BaseModel, Generic["T"]):
@@ -20,7 +22,7 @@ class Rule(abc.ABC, BaseModel, Generic["T"]):
     name: str
     effect: str
     user_input: UserAction | None
-    trigger: str | list[str] | None
+    trigger: str | list[str] | None | Card
 
     def __init__(
         self,
@@ -99,7 +101,7 @@ class Game(BaseModel, abc.ABC):
     :attr _players: Total number of players
     """
 
-    _name: str
+    name: ClassVar[str]
     _rules: list[Rule] = PrivateAttr(default_factory=list)
     _turns: list[TurnResult] = PrivateAttr(default_factory=list)
     _player: int = PrivateAttr(default=0)
@@ -110,14 +112,6 @@ class Game(BaseModel, abc.ABC):
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
         self._default_rules()
-
-    @property
-    @classmethod
-    def game_name(cls) -> str:
-        """
-        Property containing the name of the game
-        """
-        return cls._name
 
     @abc.abstractmethod
     def _play_turn(self) -> TurnResult:
@@ -150,7 +144,7 @@ class Game(BaseModel, abc.ABC):
 
     def game_state(self) -> dict:
         return {
-            "name": self._name,
+            "name": self.name,
             "rules": self._rules,
             "ended": self.end_reached,
         }
@@ -169,7 +163,7 @@ class Game(BaseModel, abc.ABC):
         """
         if name in GAMES:
             return GAMES[name]
-        raise Exception("Game does not exist for the moment")
+        raise DrunkException("Game does not exist for the moment")
 
     @abc.abstractmethod
     def _default_rules(self) -> None:
@@ -211,4 +205,4 @@ class Game(BaseModel, abc.ABC):
         return True
 
 
-GAMES = {cast(str, game.game_name): game for game in Game.__subclasses__()}
+GAMES = {game.name: game for game in Game.__subclasses__()}

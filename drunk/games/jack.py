@@ -7,7 +7,7 @@ from .devices import DiceResult, PokerDice
 
 
 class JackResult(TurnResult):
-    dice_result: str
+    dice_result: DiceResult
 
 
 class JackRule(Rule):
@@ -62,7 +62,7 @@ class Jack(Game):
     def _default_rules(self) -> None:
         self.set_rule(
             rule=JackRule(
-                "Default black rule",
+                name="Default black rule",
                 effect="Player to the right drinks",
                 trigger="black",
                 user_input=None,
@@ -70,7 +70,7 @@ class Jack(Game):
         )
         self.set_rule(
             rule=JackRule(
-                "Default red rule",
+                name="Default red rule",
                 effect="Player to the left drinks",
                 trigger="red",
                 user_input=None,
@@ -78,7 +78,7 @@ class Jack(Game):
         )
         self.set_rule(
             rule=JackRule(
-                "Default jack rule",
+                name="Default jack rule",
                 effect="All jacks drink",
                 trigger="j",
                 user_input=UserAction(action_type=UserActionType.REPEAT),
@@ -86,7 +86,7 @@ class Jack(Game):
         )
         self.set_rule(
             rule=JackRule(
-                "Default king rule",
+                name="Default king rule",
                 effect="Both sides drink",
                 trigger="k",
                 user_input=None,
@@ -94,7 +94,7 @@ class Jack(Game):
         )
         self.set_rule(
             rule=JackRule(
-                "Default ace rule",
+                name="Default ace rule",
                 effect="Player sets a rule",
                 trigger="ace",
                 user_input=UserAction(action_type=UserActionType.SET_RULE),

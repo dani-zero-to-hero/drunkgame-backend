@@ -5,7 +5,7 @@ information to databases
 import uuid
 from typing import Any
 
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
+from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 
 from ..games import Game
 from ..players import Player
@@ -44,7 +44,7 @@ class Match(BaseModel):
     """
 
     match_id: str
-    players: list[str]
+    players: list[Player]
     match_type: str
     match_state: MatchState
     _match_result: MatchResult | None
@@ -52,27 +52,11 @@ class Match(BaseModel):
     name: str
     _turns: list[MatchTurnResult]
 
-    @classmethod
-    async def new_match(cls) -> "Match":
-        """
-        Create a new match to play
-        """
-        match = cls()
-        match._save_match()
-        return match
-
-    @classmethod
-    async def get_match(cls, match_id: str) -> "Match":
-        """
-        Retrieve the match from the match_id
-        """
-        return cls(match_id=match_id)
-
     def _save_match(self) -> bool:
-        pass
+        return False
 
     def update(self, update: Any) -> bool:
-        pass
+        return bool(update)
 
     @property
     def has_ended(self) -> bool:

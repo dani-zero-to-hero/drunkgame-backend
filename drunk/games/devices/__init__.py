@@ -28,9 +28,6 @@ class Dice(ABC):
             return randint(0, self.sides)
         return self.sides[randint(0, len(self.sides) - 1)]
 
-    def weighted_roll(self, weight: float) -> DiceResult:
-        pass
-
     def cheat_roll(self, result: DiceResult) -> DiceResult:
         """
         If the result is believable return the given result.
@@ -101,11 +98,6 @@ class CardDeck(ABC):
         temp = self.cards.pop(choice)
         self.discarded.append(temp)
         return temp
-
-    def weighted_draw(self, weight: float) -> DiceSide:
-        """
-        Draw a random card from the deck. The chances of the cards are slightly modified
-        """
 
     def cheat_draw(self, result: Card) -> Card:
         """

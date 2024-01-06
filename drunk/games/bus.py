@@ -56,7 +56,7 @@ class Bus(Game):
     def _default_rules(self) -> None:
         self.set_rule(
             rule=BusRule(
-                "Drink shot",
+                name="Drink shot",
                 effect="Drink",
                 trigger=Jocker,
                 user_input=None,
@@ -64,5 +64,5 @@ class Bus(Game):
         )
 
 
-if __name__ == "__main__":
-    bus = Bus()
+if __name__ == "__main__":  # pragma: no cover
+    bus = Bus(_deck=[PockerDeck()])
