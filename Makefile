@@ -18,6 +18,7 @@ check:
 	.env/bin/flake8 drunk tests
 	.env/bin/mypy drunk tests
 	.env/bin/pylint drunk tests
+	.env/bin/bandit drunk tests
 
 format:
 	.env/bin/isort drunk tests

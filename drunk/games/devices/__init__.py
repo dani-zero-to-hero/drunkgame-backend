@@ -4,9 +4,10 @@ This module contains the definition of the game devices, dices and cards for exa
 from abc import ABC
 from dataclasses import dataclass
 from random import randint
-from typing import Any
+from typing import Any, Literal
 
-DiceSide = int | list[str]
+from ...exceptions import InvalidDraw, UserError
+
 DiceResult = int | str
 
 
@@ -16,7 +17,7 @@ class Dice(ABC):
     :param sides: sides of the current dice
     """
 
-    sides: DiceSide
+    sides: int | list[str]
 
     def random_roll(self) -> DiceResult:
         """
@@ -44,7 +45,8 @@ class Dice(ABC):
             return result
 
         if (
-            isinstance(self.sides, str)
+            isinstance(self.sides, list)
+            and isinstance(self.sides[0], str)
             and isinstance(result, str)
             and result in self.sides
         ):
@@ -79,33 +81,54 @@ class Card:
 Jocker = Card("jocker", None)
 
 
+@dataclass
 class CardDeck(ABC):
     """
-    A set of Card objects.
+    A set of Card objects. This represents the deck of cards many games are played with.
+    - cards
     """
 
-    cards: list[Card]
+    available: list[Card]
     discarded: list[Card]
+    delt: list[Card]
 
-    def __init__(self) -> None:
-        self.discarded = []
+    def __init__(
+        self,
+        available: list[Card] | None = None,
+        discarded: list[Card] | None = None,
+        delt: list[Card] | None = None,
+    ) -> None:
+        self.available = available if available else []
+        self.discarded = discarded if discarded else []
+        self.delt = delt if delt else []
 
-    def random_draw(self) -> Card:
+    def random_draw(self, action: Literal["deal", "discard"]) -> Card | None:
         """
         Draw a random card from the deck. All cards should have the same chance
         """
-        choice = randint(0, len(self.cards))  # nosec
-        temp = self.cards.pop(choice)
-        self.discarded.append(temp)
+        if not self.available:
+            return None
+        choice = randint(0, len(self.available))  # nosec
+        temp = self.available.pop(choice)
+        if action == "discard":
+            self.discarded.append(temp)
+        elif action == "deal":
+            self.delt.append(temp)
+        else:
+            raise UserError("Action not allowed, either deal or discard the card")
         return temp
 
-    def cheat_draw(self, result: Card) -> Card:
+    def cheat_draw(self, result: Card) -> Card | None:
         """
         Draw a card not from the deck. If someone cheats the card is not drawn but added to the deck
         """
-        if result in self.cards + self.discarded:
+        if not self.available and not self.discarded:
+            return None
+        if result in self.available + self.discarded:
             return result
-        raise AttributeError("Given result cannot be used")
+        if result in self.delt:
+            raise InvalidDraw("Card was drawn by a player")
+        raise InvalidDraw("Drawn card is not valid")
 
 
 class PockerDeck(CardDeck):
@@ -113,10 +136,18 @@ class PockerDeck(CardDeck):
     A classic pocker deck, the number of jockers can be altered through the jockers parameter.
     """
 
-    def __init__(self, jockers: int = 2):
-        super().__init__()
+    def __init__(
+        self,
+        available: list[Card] | None = None,
+        discarded: list[Card] | None = None,
+        delt: list[Card] | None = None,
+        jockers: int = 2,
+    ):
+        super().__init__(available=available, discarded=discarded, delt=delt)
+        if available is not None or discarded is not None or delt is not None:
+            return
         cards = []
-        for suit in ["diamond", "clubs", "hearts", "spades"]:
+        for suit in ["diamonds", "clubs", "hearts", "spades"]:
             for symbol in [
                 "ace",
                 *[str(i) for i in range(2, 11)],
@@ -125,5 +156,31 @@ class PockerDeck(CardDeck):
                 "king",
             ]:
                 cards.append(Card(suit=suit, symbol=symbol))
-        self.cards = cards
-        self.cards.extend([Jocker for i in range(jockers)])
+        self.available = cards
+        self.available.extend([Jocker for i in range(jockers)])
+
+
+class SpanishDeck(CardDeck):
+    """
+    A classic spanish deck.
+    """
+
+    def __init__(
+        self,
+        available: list[Card] | None = None,
+        discarded: list[Card] | None = None,
+        delt: list[Card] | None = None,
+    ):
+        super().__init__(available=available, discarded=discarded, delt=delt)
+        if available is not None or discarded is not None or delt is not None:
+            return
+        cards = []
+        for suit in ["swords", "golds", "cups", "clubs"]:
+            for symbol in [
+                *[str(i) for i in range(1, 10)],
+                "jack",
+                "knight",
+                "king",
+            ]:
+                cards.append(Card(suit=suit, symbol=symbol))
+        self.available = cards

@@ -28,6 +28,7 @@ class UserActionType(Enum):
     SEND_DRINK = "send_drink"
     REPEAT = "repeat"
     DRINK = "drink"
+    DONT_REPEAT = "dont_repeat"
 
 
 class UserAction(BaseModel):

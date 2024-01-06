@@ -18,10 +18,12 @@ class JackRule(Rule):
     def applies(self, trigger: DiceResult, turns: list[JackResult]) -> bool:
         if isinstance(self.trigger, str) and trigger == self.trigger:
             return True
-        if isinstance(self.trigger, list) and trigger == self.trigger[-1]:
+        if isinstance(self.trigger, list) and trigger == self.trigger[-1] and turns:
             applies = True
-            for i in range(1, len(self.trigger)):
-                if turns[0 - i].dice_result != self.trigger[-1 - i]:
+            for index, iter_trigger in enumerate(self.trigger[1::-1]):
+                if index > len(turns):
+                    break
+                if turns[0 - index].dice_result != iter_trigger:
                     applies = False
                     break
             if applies:
@@ -34,17 +36,16 @@ class Jack(Game):
     This class contains all the logic to play the Jack game
     """
 
-    _name: str = "jack"
+    name = "jack"
     _dice = PokerDice()
     _rule_class = JackRule
-    _turn_class = JackResult
 
     def _play_turn(self) -> JackResult:
         user_input = []
-        roll = self._dice.random_roll()
+        roll = self._dice.cheat_roll("j")
         rules = []
-        for rule in self._rules:
-            if rule.applies(roll, self._turns):
+        for rule in self.rules:
+            if rule.applies(roll, self.turns):
                 rules.append(rule)
                 if rule.user_input is not None:
                     user_input.append(rule.user_input)
@@ -100,21 +101,19 @@ class Jack(Game):
                 user_input=UserAction(action_type=UserActionType.SET_RULE),
             )
         )
+        self.set_rule(
+            rule=JackRule(
+                name="Default triple jack drinks shot",
+                effect="Player drinks",
+                trigger=["j", "j", "j"],
+                user_input=UserAction(
+                    action_type=UserActionType.DONT_REPEAT, drink_amount=10
+                ),
+            )
+        )
 
 
 if __name__ == "__main__":
     jack = Jack()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
-    jack.play_turn()
+    for _ in range(20):
+        print(jack.play_turn().dice_result)

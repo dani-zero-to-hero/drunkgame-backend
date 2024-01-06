@@ -4,25 +4,32 @@ This module contains all the games offered in the DrunkGame api
 from __future__ import annotations
 
 import abc
-from typing import Any, ClassVar, Generic, Type, TypeVar, cast, overload
+from typing import Any, ClassVar, Generic, Type, TypeVar, overload
 
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
-from pydantic import PrivateAttr
+from pydantic import (  # pylint: disable=no-name-in-module
+    BaseModel,
+    Field,
+    PrivateAttr,
+)
 
 from ..exceptions import DrunkException
 from ..players import UserAction, UserActionType
-from .devices import Card
+from .devices import Card, DiceResult
 
 
-class Rule(abc.ABC, BaseModel, Generic["T"]):
+class Rule(abc.ABC, BaseModel):
     """
-    Object that defines a rule that applies to a game. These rule is generic and has to be redefined per game.
+    Object that defines a rule that applies to a game. This rule is generic and has to be redefined per game.
+    - name: identifiable name for the rule
+    - effect: result of this rule being activated
+    - user_input: An action the user has to take when this rule is activated. It is a specific kind of effect
+    - trigger: The action or turn result that activates the specific rule
     """
 
     name: str
     effect: str
     user_input: UserAction | None
-    trigger: str | list[str] | None | Card
+    trigger: DiceResult | Card | list[str] | list[int] | list[Card] | None
 
     def __init__(
         self,
@@ -50,12 +57,13 @@ class Rule(abc.ABC, BaseModel, Generic["T"]):
         if (
             self.user_input is not None
             and self.user_input.action_type == UserActionType.REPEAT.value
+            and self.user_input.action_type == UserActionType.DONT_REPEAT.value
         ):
             return True
         return False
 
     @abc.abstractmethod
-    def applies(self, trigger: Any, turns: list[T]) -> bool:
+    def applies(self, trigger: Any, turns: Any) -> bool:
         ...
 
     @staticmethod
@@ -89,7 +97,7 @@ class TurnResult(abc.ABC, BaseModel):
 T = TypeVar("T", bound=TurnResult)
 
 
-class Game(BaseModel, abc.ABC):
+class Game(BaseModel, abc.ABC, Generic[T]):
     """
     Abstract class specifying a game. It contains a name, a set of rules, the list of turns, the current player and the
     total number of players.
@@ -102,22 +110,23 @@ class Game(BaseModel, abc.ABC):
     """
 
     name: ClassVar[str]
-    _rules: list[Rule] = PrivateAttr(default_factory=list)
-    _turns: list[TurnResult] = PrivateAttr(default_factory=list)
-    _player: int = PrivateAttr(default=0)
-    _players: int = PrivateAttr(default=2)
+    rules: list[Rule] = Field(default_factory=list)
+    turns: list[T] = Field(default_factory=list)
+    player: int = Field(default=0)
+    _players: int = PrivateAttr(
+        default=2
+    )  # TODO: rethink the connection between players and game
     _rule_class: ClassVar[Type[Rule]]
-    _turn_class: ClassVar[Type[TurnResult]]
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
         self._default_rules()
 
     @abc.abstractmethod
-    def _play_turn(self) -> TurnResult:
+    def _play_turn(self) -> T:
         ...
 
-    def play_turn(self) -> TurnResult:
+    def play_turn(self) -> T:
         """
         Play a turn of the game. This function is a wrapper around _play_turn which defines the game specific rules and
         actions. After the turn has been played the result is saved in turns and the current player is advanced
@@ -126,13 +135,13 @@ class Game(BaseModel, abc.ABC):
         :return: The result of the played turn.
         """
         turn = self._play_turn()
-        if isinstance(self._turns, list):
-            self._turns.append(turn)
+        if isinstance(self.turns, list):
+            self.turns.append(turn)
         if not any(rule.repeat for rule in turn.applied_rules):
-            self._player += 1
-            if self._player >= self._players:
-                self._player = 0
-        print(f"Next player is {self._player}")
+            self.player += 1
+            if self.player >= self._players:
+                self.player = 0
+        print(f"Next player is {self.player}")
         return turn
 
     @property
@@ -145,7 +154,7 @@ class Game(BaseModel, abc.ABC):
     def game_state(self) -> dict:
         return {
             "name": self.name,
-            "rules": self._rules,
+            "rules": self.rules,
             "ended": self.end_reached,
         }
 
@@ -196,12 +205,12 @@ class Game(BaseModel, abc.ABC):
         """
         Add a rule to the current game set of rules
         """
-        if rule is not None:
-            self._rules.append(rule)
+        if rule is not None and isinstance(rule, self._rule_class):
+            self.rules.append(rule)  # pylint: disable=no-member
             return True
 
         rule = self._rule_class(name, effect, trigger, user_input)
-        self._rules.append(rule)
+        self.rules.append(rule)  # pylint: disable=no-member
         return True
 
 

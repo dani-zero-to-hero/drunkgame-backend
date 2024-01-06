@@ -4,6 +4,7 @@ This module contains all the code necessary to play a match of bus driver
 from random import choice
 from typing import Any
 
+from ..exceptions import InvalidDraw
 from . import Game, Rule, TurnResult
 from .devices import Card, Jocker, PockerDeck
 
@@ -26,19 +27,21 @@ class Bus(Game):
     This class contains all the logic to play the Bus driver
     """
 
-    _name: str = "bus"
+    name = "bus"
     _deck: list[PockerDeck]
 
     @property
     def current_deck(self) -> PockerDeck:
-        return choice([deck for deck in self._deck if deck.cards])  # nosec
+        return choice([deck for deck in self._deck if deck.available])  # nosec
 
     def _play_turn(self) -> BusResult:
         user_input = []
-        card = self.current_deck.random_draw()
+        card = self.current_deck.random_draw("deal")
+        if card is None:
+            raise InvalidDraw("Card is not valid")
         rules = []
-        for rule in self._rules:
-            if rule.applies(card, self._turns):
+        for rule in self.rules:
+            if rule.applies(card, self.turns):
                 rules.append(rule)
                 if rule.user_input is not None:
                     user_input.append(rule.user_input)
