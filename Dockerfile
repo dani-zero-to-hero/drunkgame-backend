@@ -10,7 +10,7 @@ COPY drunk /app/drunk
 COPY setup.py /app/
 RUN pip install -e .
 
-FROM bare-drunk AS drunk-testing
+FROM drunk AS drunk-testing
 
 COPY requirements.check.txt /app
 COPY setup.cfg /app
