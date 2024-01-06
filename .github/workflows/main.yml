@@ -49,6 +49,9 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
 
+      - name: Pull testing image
+        run: docker pull ghcr.io/dani-zero-to-hero/drunk-testing
+
       - name: Run flake8
         run: docker run ghcr.io/dani-zero-to-hero/drunk-testing flake8 drunk tests
 
