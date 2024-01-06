@@ -25,8 +25,8 @@ class Dice(ABC):
         :return: Result of a random roll of the dice
         """
         if isinstance(self.sides, int):
-            return randint(0, self.sides)
-        return self.sides[randint(0, len(self.sides) - 1)]
+            return randint(0, self.sides)  # nosec
+        return self.sides[randint(0, len(self.sides) - 1)]  # nosec
 
     def cheat_roll(self, result: DiceResult) -> DiceResult:
         """
@@ -94,7 +94,7 @@ class CardDeck(ABC):
         """
         Draw a random card from the deck. All cards should have the same chance
         """
-        choice = randint(0, len(self.cards))
+        choice = randint(0, len(self.cards))  # nosec
         temp = self.cards.pop(choice)
         self.discarded.append(temp)
         return temp

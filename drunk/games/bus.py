@@ -31,7 +31,7 @@ class Bus(Game):
 
     @property
     def current_deck(self) -> PockerDeck:
-        return choice([deck for deck in self._deck if deck.cards])
+        return choice([deck for deck in self._deck if deck.cards])  # nosec
 
     def _play_turn(self) -> BusResult:
         user_input = []
