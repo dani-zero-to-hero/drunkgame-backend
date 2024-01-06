@@ -28,10 +28,10 @@ jobs:
           password: ${{secrets.GITHUB_TOKEN}}
       - name: Build docker testing image
         run: |
-          docker build -t ghcr.io/dani-zero-to-hero/drunk-testing .
-          docker build -t ghcr.io/dani-zero-to-hero/drunk --target drunk .
-          docker push ghcr.io/dani-zero-to-hero/drunk-testing
-          docker push ghcr.io/dani-zero-to-hero/drunk
+          docker build -t ghcr.io/dani-zero-to-hero/DG-backend:testing-latest .
+          docker build -t ghcr.io/dani-zero-to-hero/DG-backend:latest --target drunk .
+          docker push ghcr.io/dani-zero-to-hero/DG-backend:testing-latest
+          docker push ghcr.io/dani-zero-to-hero/DG-backend:latest
 
   flake8:
     runs-on: ubuntu-latest
