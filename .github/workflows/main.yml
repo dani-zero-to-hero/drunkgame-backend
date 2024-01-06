@@ -30,8 +30,12 @@ jobs:
         run: |
           docker build -t ghcr.io/dani-zero-to-hero/drunkgame-backend:testing-latest .
           docker build -t ghcr.io/dani-zero-to-hero/drunkgame-backend:latest --target drunk .
+      - name: Push to GHCR
+        run: |
           docker push ghcr.io/dani-zero-to-hero/drunkgame-backend:testing-latest
           docker push ghcr.io/dani-zero-to-hero/drunkgame-backend:latest
+        permissions:
+          packages: write
 
   flake8:
     runs-on: ubuntu-latest
